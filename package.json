@@ -1,0 +1,15 @@
+{
+  "name": "xcode-bundle-management",
+  "version": "1.0.0",
+  "description": "Library of functions for managing IOS bundle ids in xcode",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/rhdeck/xcode-bundle-management"
+  },
+  "author": "Ray Deck",
+  "license": "MIT"
+}
