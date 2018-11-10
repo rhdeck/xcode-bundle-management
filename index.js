@@ -14,14 +14,16 @@ module.exports.updatePlist = path => {
 module.exports.updatePbxproj = (path, newBundle) => {
   const project = Project(path);
   project.parseSync();
-  Object.keys(project.pbxXCBuildConfigurationSection())
-    .filter(k => !k.endsWith("_comment"))
-    .forEach(k => {
-      const o = project.pbxXCBuildConfigurationSection()[k];
+  Object.entries(project.pbxXCBuildConfigurationSection())
+    .filter(([k]) => !k.endsWith("_comment"))
+    .forEach(([k, o]) => {
       if (!o.isa == "XCBuildConfiguration") return;
       const oldName = o.buildSettings.PRODUCT_BUNDLE_IDENTIFIER;
-      if (oldName != newBundle)
+      if (oldName && oldName != newBundle) {
         project.addBuildProperty("PRODUCT_BUNDLE_IDENTIFIER", `"${newBundle}"`);
+        //Add the product name
+        project.addBuildProperty("PRODUCT_NAME", newBundle.split(".").pop());
+      }
     });
   fs.writeFileSync(path, project.writeSync());
 };
@@ -34,19 +36,33 @@ module.exports.getBundleFromPbxproj = path => {
       buildSettings: { PRODUCT_BUNDLE_IDENTIFIER }
     }
   ] = Object.entries(project.pbxXCBuildConfigurationSection())
-    .filter(k => !k.endsWith("_comment"))
-    .find((k, o) => o.isa == "XCBuildConfiguration");
-  return PRODUCT_BUNDLE_IDENTIFIER;
+    .filter(([k]) => !k.endsWith("_comment"))
+    .filter(([k, o]) => o.isa == "XCBuildConfiguration")
+    .find(
+      ([_, o]) => o.buildSettings && o.buildSettings.PRODUCT_BUNDLE_IDENTIFIER
+    );
+  return PRODUCT_BUNDLE_IDENTIFIER.replace(/"/g, "");
+};
+module.exports.getNameFromPbxproj = path => {
+  const project = Project(path);
+  project.parseSync();
+  const productName = Object.entries(project.pbxXCBuildConfigurationSection())
+    .filter(([k]) => !k.endsWith("_comment"))
+    .filter(([k, o]) => o.isa == "XCBuildConfiguration")
+    .filter(([_, o]) => o.buildSettings && o.buildSettings.PRODUCT_NAME)
+    .map(([_, o]) => o.buildSettings.PRODUCT_NAME)
+    .find(n => n.indexOf("$") === -1);
+  return productName.replace(/"/g, "");
 };
 module.exports.getBundleBaseFromPackage = (thisPath = process.cwd()) => {
   const packagePath = join(thisPath, "package.json");
   const { iosBundleBase } = JSON.parse(packagePath);
-  return iosBundleBase;
+  return iosBundleBase.trim();
 };
 module.exports.getBaseFromBundle = bundle => {
   const lastIndex = bundle.lastIndexOf(".");
   return lastIndex > -1 ? bundle.substring(0, lastIndex) : bundle;
 };
 module.exports.getNameFromBundle = bundle => {
-  return bundle.split(".").pop();
+  return bundle && bundle.split(".").pop();
 };
