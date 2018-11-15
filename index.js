@@ -14,15 +14,24 @@ module.exports.updatePlist = path => {
 module.exports.updatePbxproj = (path, newBundle) => {
   const project = Project(path);
   project.parseSync();
+  console.log("Checking my buildconfigurations");
   Object.entries(project.pbxXCBuildConfigurationSection())
     .filter(([k]) => !k.endsWith("_comment"))
-    .forEach(([k, o]) => {
-      if (!o.isa == "XCBuildConfiguration") return;
-      const oldName = o.buildSettings.PRODUCT_BUNDLE_IDENTIFIER;
-      if (oldName && oldName != newBundle) {
-        project.addBuildProperty("PRODUCT_BUNDLE_IDENTIFIER", `"${newBundle}"`);
-        //Add the product name
-        project.addBuildProperty("PRODUCT_NAME", newBundle.split(".").pop());
+    .filter(([_, { isa }]) => isa == "XCBuildConfiguration")
+    .filter(([_, { buildSettings: { TEST_HOST } }]) => {
+      console.log("Hi there", TEST_HOST);
+      return !TEST_HOST;
+    })
+    .forEach(([_, { buildSettings }]) => {
+      const oldName = buildSettings.PRODUCT_BUNDLE_IDENTIFIER;
+      console.log("Checking name ", oldName);
+      if (oldName != newBundle) {
+        buildSettings.PRODUCT_BUNDLE_IDENTIFIER = `"${newBundle}"`;
+        buildSettings.PRODUCT_NAME = newBundle.split(".").pop();
+        console.log("Setitng bundle to ", newBundle);
+        // project.addBuildProperty("PRODUCT_BUNDLE_IDENTIFIER", `"${newBundle}"`);
+        // //Add the product name
+        // project.addBuildProperty("PRODUCT_NAME", newBundle.split(".").pop());
       }
     });
   fs.writeFileSync(path, project.writeSync());
@@ -37,9 +46,10 @@ module.exports.getBundleFromPbxproj = path => {
     }
   ] = Object.entries(project.pbxXCBuildConfigurationSection())
     .filter(([k]) => !k.endsWith("_comment"))
-    .filter(([k, o]) => o.isa == "XCBuildConfiguration")
+    .filter(([k, { isa }]) => isa == "XCBuildConfiguration")
     .find(
-      ([_, o]) => o.buildSettings && o.buildSettings.PRODUCT_BUNDLE_IDENTIFIER
+      ([_, { buildSettings }]) =>
+        buildSettings && buildSettings.PRODUCT_BUNDLE_IDENTIFIER
     );
   return PRODUCT_BUNDLE_IDENTIFIER.replace(/"/g, "");
 };
