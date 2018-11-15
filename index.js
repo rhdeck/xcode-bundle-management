@@ -6,7 +6,7 @@ module.exports.updatePlist = path => {
   const source = fs.readFileSync(path, "utf8");
   var o = plist.parse(source);
   if (o.CFBundleIdentifier) {
-    o.CFBundleIdendifier = "$(PRODUCT_BUNDLE_IDENTIFIER";
+    o.CFBundleIdentifier = "$(PRODUCT_BUNDLE_IDENTIFIER";
     const xml = plist.build(o);
     if (xml != source) fs.writeFileSync(path, xml);
   }
