@@ -11,5 +11,9 @@
     "url": "github.com/rhdeck/xcode-bundle-management"
   },
   "author": "Ray Deck",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "plist": "^3.0.1",
+    "xcode": "rhdeck/cordova-node-xcode"
+  }
 }
