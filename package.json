@@ -14,6 +14,6 @@
   "license": "MIT",
   "dependencies": {
     "plist": "^3.0.1",
-    "xcode": "rhdeck/cordova-node-xcode"
+    "@raydeck/xcode": "^2.2.0"
   }
 }

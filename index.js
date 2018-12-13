@@ -1,6 +1,6 @@
 const plist = require("plist");
 const fs = require("fs");
-const { project: Project } = require("xcode");
+const { project: Project } = require("@raydeck/xcode");
 const { join } = require("path");
 module.exports.updatePlist = path => {
   const source = fs.readFileSync(path, "utf8");
@@ -14,7 +14,6 @@ module.exports.updatePlist = path => {
 module.exports.updatePbxproj = (path, newBundle) => {
   const project = Project(path);
   project.parseSync();
-  console.log("Checking my buildconfigurations");
   Object.entries(project.pbxXCBuildConfigurationSection())
     .filter(([k]) => !k.endsWith("_comment"))
     .filter(([_, { isa }]) => isa == "XCBuildConfiguration")
