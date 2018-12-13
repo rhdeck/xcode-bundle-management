@@ -19,16 +19,13 @@ module.exports.updatePbxproj = (path, newBundle) => {
     .filter(([k]) => !k.endsWith("_comment"))
     .filter(([_, { isa }]) => isa == "XCBuildConfiguration")
     .filter(([_, { buildSettings: { TEST_HOST } }]) => {
-      console.log("Hi there", TEST_HOST);
       return !TEST_HOST;
     })
     .forEach(([_, { buildSettings }]) => {
       const oldName = buildSettings.PRODUCT_BUNDLE_IDENTIFIER;
-      console.log("Checking name ", oldName);
       if (oldName != newBundle) {
         buildSettings.PRODUCT_BUNDLE_IDENTIFIER = `"${newBundle}"`;
         buildSettings.PRODUCT_NAME = newBundle.split(".").pop();
-        console.log("Setitng bundle to ", newBundle);
         // project.addBuildProperty("PRODUCT_BUNDLE_IDENTIFIER", `"${newBundle}"`);
         // //Add the product name
         // project.addBuildProperty("PRODUCT_NAME", newBundle.split(".").pop());
