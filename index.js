@@ -24,7 +24,8 @@ module.exports.updatePbxproj = (path, newBundle) => {
       const oldName = buildSettings.PRODUCT_BUNDLE_IDENTIFIER;
       if (oldName != newBundle) {
         buildSettings.PRODUCT_BUNDLE_IDENTIFIER = `"${newBundle}"`;
-        buildSettings.PRODUCT_NAME = newBundle.split(".").pop();
+        const basename = newBundle.split(".").pop();
+        if (!basename.include("$")) buildSettings.PRODUCT_NAME = basename;
         // project.addBuildProperty("PRODUCT_BUNDLE_IDENTIFIER", `"${newBundle}"`);
         // //Add the product name
         // project.addBuildProperty("PRODUCT_NAME", newBundle.split(".").pop());
@@ -67,7 +68,9 @@ module.exports.getBundleBaseFromPackage = (thisPath = process.cwd()) => {
 };
 module.exports.getBundleFromPackage = (thisPath = process.cwd()) => {
   const packagePath = join(thisPath, "package.json");
+  console.log("package path is ", packagePath);
   const { iosBundle } = JSON.parse(packagePath);
+
   return iosBundle.trim();
 };
 module.exports.getBaseFromBundle = bundle => {
