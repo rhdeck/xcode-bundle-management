@@ -25,7 +25,7 @@ module.exports.updatePbxproj = (path, newBundle) => {
       if (oldName != newBundle) {
         buildSettings.PRODUCT_BUNDLE_IDENTIFIER = `"${newBundle}"`;
         const basename = newBundle.split(".").pop();
-        if (!basename.include("$")) buildSettings.PRODUCT_NAME = basename;
+        if (!basename.includes("$")) buildSettings.PRODUCT_NAME = basename;
         // project.addBuildProperty("PRODUCT_BUNDLE_IDENTIFIER", `"${newBundle}"`);
         // //Add the product name
         // project.addBuildProperty("PRODUCT_NAME", newBundle.split(".").pop());
