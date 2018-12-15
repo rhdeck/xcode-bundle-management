@@ -65,6 +65,11 @@ module.exports.getBundleBaseFromPackage = (thisPath = process.cwd()) => {
   const { iosBundleBase } = JSON.parse(packagePath);
   return iosBundleBase.trim();
 };
+module.exports.getBundleFromPackage = (thisPath = process.cwd()) => {
+  const packagePath = join(thisPath, "package.json");
+  const { iosBundle } = JSON.parse(packagePath);
+  return iosBundle.trim();
+};
 module.exports.getBaseFromBundle = bundle => {
   const lastIndex = bundle.lastIndexOf(".");
   return lastIndex > -1 ? bundle.substring(0, lastIndex) : bundle;
